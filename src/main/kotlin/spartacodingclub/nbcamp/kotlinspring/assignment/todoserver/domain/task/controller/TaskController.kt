@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoserver.domain.task.dto.request.CreateTaskRequest
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoserver.domain.task.dto.request.UpdateTaskRequest
+import spartacodingclub.nbcamp.kotlinspring.assignment.todoserver.domain.task.dto.response.TaskFullResponse
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoserver.domain.task.dto.response.TaskResponse
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoserver.domain.task.service.TaskService
 
@@ -28,7 +29,7 @@ class TaskController(
             .body(taskService.getAllTasks())
 
     @GetMapping("/{taskId}")
-    fun getTask(@PathVariable taskId: Long): ResponseEntity<TaskResponse> =
+    fun getTask(@PathVariable taskId: Long): ResponseEntity<TaskFullResponse> =
         ResponseEntity
             .status(HttpStatus.OK)
             .body(taskService.getTask(taskId))
@@ -40,6 +41,13 @@ class TaskController(
             .status(HttpStatus.OK)
             .body(taskService.updateTask(taskId, request))
 
+    @PatchMapping("/{taskId}/completion")
+    fun toggleTaskCompletion(@PathVariable taskId: Long): ResponseEntity<Unit> {
+        taskService.toggleTaskCompletion(taskId)
+        return ResponseEntity
+            .status(HttpStatus.NO_CONTENT)
+            .build()
+    }
 
     @DeleteMapping("/{taskId}")
     fun removeTask(@PathVariable taskId: Long): ResponseEntity<Unit> {
