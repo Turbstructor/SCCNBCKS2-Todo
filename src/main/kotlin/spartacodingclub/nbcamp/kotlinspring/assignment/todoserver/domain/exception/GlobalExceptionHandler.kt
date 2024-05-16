@@ -14,4 +14,10 @@ class GlobalExceptionHandler {
         ResponseEntity
             .status(HttpStatus.NOT_FOUND)
             .body(ErrorResponse(ex.message))
+
+    @ExceptionHandler(UnauthorizedAccessException::class)
+    fun handleUnauthorizedAccessException(ex: UnauthorizedAccessException): ResponseEntity<ErrorResponse> =
+        ResponseEntity
+            .status(HttpStatus.UNAUTHORIZED)
+            .body(ErrorResponse(ex.message))
 }

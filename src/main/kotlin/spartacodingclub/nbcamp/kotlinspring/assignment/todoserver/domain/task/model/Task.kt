@@ -4,6 +4,7 @@ import jakarta.persistence.*
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
+import spartacodingclub.nbcamp.kotlinspring.assignment.todoserver.domain.comment.model.Comment
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoserver.domain.task.dto.response.TaskResponse
 import java.time.LocalDateTime
 
@@ -32,6 +33,21 @@ class Task(
     @LastModifiedDate
     var timeUpdated: LocalDateTime? = null
 
+    @Column(name = "is_done", nullable = false)
+    var isDone: Boolean = false
 
-    fun toResponse(): TaskResponse = TaskResponse(id, title, description, owner, timeCreated, timeUpdated)
+
+    @OneToMany(mappedBy = "task", cascade = [(CascadeType.ALL)], orphanRemoval = true)
+    var comments: MutableList<Comment> = mutableListOf()
+
+
+    fun addComment(comment: Comment) {
+        comments.add(comment)
+    }
+
+    fun removeComment(comment: Comment) {
+        comments.remove(comment)
+    }
+
+    fun toResponse(): TaskResponse = TaskResponse(id!!, title, description, isDone, owner, timeCreated!!, timeUpdated!!)
 }

@@ -3,10 +3,11 @@ package spartacodingclub.nbcamp.kotlinspring.assignment.todoserver.domain.task.d
 import java.time.LocalDateTime
 
 data class TaskResponse(
-    val id: Long?,
+    val id: Long,
     val title: String,
     val description: String,
+    val isDone: Boolean,
     val owner: String,
-    val timeCreated: LocalDateTime?,
-    val timeUpdated: LocalDateTime?
+    val timeCreated: LocalDateTime,
+    val timeUpdated: LocalDateTime
 )

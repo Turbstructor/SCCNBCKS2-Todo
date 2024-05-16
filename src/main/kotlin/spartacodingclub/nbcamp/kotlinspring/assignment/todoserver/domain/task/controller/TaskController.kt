@@ -40,6 +40,13 @@ class TaskController(
             .status(HttpStatus.OK)
             .body(taskService.updateTask(taskId, request))
 
+    @PatchMapping("/{taskId}/completion")
+    fun toggleTaskCompletion(@PathVariable taskId: Long): ResponseEntity<Unit> {
+        taskService.toggleTaskCompletion(taskId)
+        return ResponseEntity
+            .status(HttpStatus.NO_CONTENT)
+            .build()
+    }
 
     @DeleteMapping("/{taskId}")
     fun removeTask(@PathVariable taskId: Long): ResponseEntity<Unit> {
