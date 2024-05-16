@@ -13,6 +13,7 @@ import spartacodingclub.nbcamp.kotlinspring.assignment.todoserver.domain.excepti
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoserver.domain.exception.UnauthorizedAccessException
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoserver.domain.task.dto.request.CreateTaskRequest
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoserver.domain.task.dto.request.UpdateTaskRequest
+import spartacodingclub.nbcamp.kotlinspring.assignment.todoserver.domain.task.dto.response.TaskFullResponse
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoserver.domain.task.dto.response.TaskResponse
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoserver.domain.task.model.Task
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoserver.domain.task.repository.TaskRepository
@@ -33,10 +34,9 @@ class TaskService(
 
     fun getAllTasks(): List<TaskResponse> = taskRepository.findAll().map { it.toResponse() }
 
-    fun getTask(taskId: Long): TaskResponse {
-        val task = taskRepository.findByIdOrNull(taskId) ?: throw ItemNotFoundException(taskId, "task")
-        return task.toResponse()
-    }
+    fun getTask(taskId: Long): TaskFullResponse =
+        (taskRepository.findByIdOrNull(taskId) ?: throw ItemNotFoundException(taskId, "task"))
+        .toFullResponse()
 
     @Transactional
     fun updateTask(taskId: Long, request: UpdateTaskRequest): TaskResponse {

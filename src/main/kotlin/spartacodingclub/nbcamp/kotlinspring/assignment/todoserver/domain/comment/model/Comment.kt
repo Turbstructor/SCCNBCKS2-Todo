@@ -13,6 +13,7 @@ import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoserver.domain.comment.dto.response.CommentResponse
+import spartacodingclub.nbcamp.kotlinspring.assignment.todoserver.domain.comment.dto.response.CommentSimplifiedResponse
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoserver.domain.task.model.Task
 import java.time.LocalDateTime
 
@@ -48,4 +49,5 @@ class Comment(
 
 
     fun toResponse(): CommentResponse = CommentResponse(id!!, content, owner, timeCreated!!, timeUpdated!!, task.toResponse())
+    fun toSimplifiedResponse(): CommentSimplifiedResponse = CommentSimplifiedResponse(id!!, content, owner, timeCreated!!, timeUpdated!!)
 }

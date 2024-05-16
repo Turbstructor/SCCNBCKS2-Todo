@@ -6,6 +6,7 @@ import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoserver.domain.comment.model.Comment
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoserver.domain.task.dto.response.TaskResponse
+import spartacodingclub.nbcamp.kotlinspring.assignment.todoserver.domain.task.dto.response.TaskFullResponse
 import java.time.LocalDateTime
 
 @Entity
@@ -50,4 +51,5 @@ class Task(
     }
 
     fun toResponse(): TaskResponse = TaskResponse(id!!, title, description, isDone, owner, timeCreated!!, timeUpdated!!)
+    fun toFullResponse(): TaskFullResponse = TaskFullResponse(id!!, title, description, isDone, owner, timeCreated!!, timeUpdated!!, comments.map { it.toSimplifiedResponse() })
 }
