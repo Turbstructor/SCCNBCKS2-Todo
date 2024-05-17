@@ -1,5 +1,6 @@
 package spartacodingclub.nbcamp.kotlinspring.assignment.todoserver.domain.task.controller
 
+import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -16,7 +17,7 @@ class TaskController(
 ) {
 
     @PostMapping
-    fun createTask(@RequestBody request: CreateTaskRequest): ResponseEntity<TaskResponse> =
+    fun createTask(@Valid @RequestBody request: CreateTaskRequest): ResponseEntity<TaskResponse> =
         ResponseEntity
             .status(HttpStatus.CREATED)
             .body(taskService.createTask(request))
@@ -36,7 +37,7 @@ class TaskController(
 
 
     @PatchMapping("/{taskId}")
-    fun updateTask(@PathVariable taskId: Long, @RequestBody request: UpdateTaskRequest): ResponseEntity<TaskResponse> =
+    fun updateTask(@PathVariable taskId: Long, @Valid @RequestBody request: UpdateTaskRequest): ResponseEntity<TaskResponse> =
         ResponseEntity
             .status(HttpStatus.OK)
             .body(taskService.updateTask(taskId, request))
