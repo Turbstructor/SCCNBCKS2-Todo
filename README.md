@@ -69,6 +69,18 @@
 
 </details>
 
+<details> <summary>1-3. Step 3 (선택)</summary>
+
+- [v] 할 일(`task`) 목록 조회(`GET /api/tasks`) 기능 보강
+  - 할 일 작성일을 기준으로 오름차순/내림차순 정렬하는 기능 추가
+  - 작성자 이름 포함 시 해당 작성자가 작성한 할 일만 포함하는 기능 추가
+- [v] 할 일(`task`) 관련 무결성 검사 기능 추가
+  - 할 일 추가/수정 시 제목/내용에 길이 제한(각각 [1, 200], [1, 1000]) 추가
+  - 제한을 어길 경우 추가/수정 요청을 받아들이지 않게 처리
+- [v] `ResponseEntity`를 사용하여 `API Call`의 응답 코드 반환
+
+</details>
+
 
 # 2. 고민거리(과제 제출 시 같이 써야 하는 질문들)
 
@@ -76,7 +88,7 @@
 
 - 2-1-1. 수정/삭제 API의 `request` 사용 방식
 
-  - 특정 `task`를 수정할 경우 `URL Path`에 `taskId`를 넣어 수정/삭제할 대상 지정
+  - 특정 `task`를 수정/삭제할 경우 `URL Path`에 `taskId`를 넣어 수정/삭제할 대상 지정
   - `task` 수정 시 `Body` 속에 `DTO` `UpdateTaskRequest`를 보관하여 사용(`@RequestBody`)
 
 - 2-1-2. RESTful API
@@ -180,17 +192,21 @@ comment (
 
 - 4-1-1. 할 일(`task`) 관련
 
-| Feature     |   Method | URL                   | Request (body)      | Response             |
-|-------------|---------:|-----------------------|---------------------|----------------------|
-| 할 일 추가      |   `POST` | `/api/tasks`          | `CreateTaskRequest` | `TaskResponse`       |
-| 할 일 조회 (목록) |    `GET` | `/api/tasks`          | -                   | `List<TaskResponse>` |
-| 할 일 조회      |    `GET` | `/api/tasks/{taskId}` | -                   | `TaskResponse`       |
-| 할 일 수정      |  `PATCH` | `/api/tasks/{taskId}` | `UpdateTaskRequest` | `TaskResponse`       |
-| 할 일 삭제      | `DELETE` | `/api/tasks/{taskId}` | -                   | -                    |
+| Feature     |   Method | URL                   | Request                                                          | Response             |
+|-------------|---------:|-----------------------|------------------------------------------------------------------|----------------------|
+| 할 일 추가      |   `POST` | `/api/tasks`          | body: `CreateTaskRequest`                                        | `TaskResponse`       |
+| 할 일 조회 (목록) |    `GET` | `/api/tasks`          | parameter: `author`(`String`), `sortByTimeCreatedAsc`(`Boolean`) | `List<TaskResponse>` |
+| 할 일 조회      |    `GET` | `/api/tasks/{taskId}` | -                                                                | `TaskResponse`       |
+| 할 일 수정      |  `PATCH` | `/api/tasks/{taskId}` | body: `UpdateTaskRequest`                                        | `TaskResponse`       |
+| 할 일 삭제      | `DELETE` | `/api/tasks/{taskId}` | -                                                                | -                    |
 
 - *특정* 할 일(`Task`)을 조회할 때 `taskId`가 존재하지 않을 경우 `ItemNotFoundException` 발생
 - 할 일 수정 시(`PATCH /api/tasks/{taskId}`) 수정사항이 없을 경우 **DB에 변경사항을 저장하지 않음**
-    - `timeUpdated` 갱신을 막기 위함
+  - `timeUpdated` 갱신을 막기 위함
+- 할 일(`task`) 목록 조회 시 _필수가 아닌_ 패러미터 2개를 받음
+  - `author`: 할 일(`task`) 작성자, 비어있지 않을 경우 **해당 작성자의 이름으로 만든** 할 일만 목록에 포함
+  - `sortByTimeCreatedAsc`: 할 일 목록을 작성일 기준 오름차순 정렬 옵션. 옵션이 주어지지 않을 경우 `true`일 때와 동일하게 오름차순으로 정렬, `false`일 경우 내림차순으로 정렬
+- 할 일 추가/수정 시 올바르지 않은 데이터 - 길이 범위에 부합하지 않는 제목/내용 - 가 들어왔을 경우 `ConstraintViolationException`/`MethodArgumentNotValidException` 발생
 
 
 - 4-1-2. 댓글(`comment`) 관련
