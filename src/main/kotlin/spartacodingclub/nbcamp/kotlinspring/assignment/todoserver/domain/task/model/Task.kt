@@ -1,6 +1,7 @@
 package spartacodingclub.nbcamp.kotlinspring.assignment.todoserver.domain.task.model
 
 import jakarta.persistence.*
+import jakarta.validation.constraints.Size
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
@@ -14,9 +15,11 @@ import java.time.LocalDateTime
 @Table(name = "task")
 class Task(
     @Column(name = "title", nullable = false)
+    @field:Size(min = 1, max = 200)
     var title: String,
 
     @Column(name = "description", nullable = false)
+    @field:Size(min = 1, max = 1000)
     var description: String,
 
     @Column(name = "owner", nullable = false)

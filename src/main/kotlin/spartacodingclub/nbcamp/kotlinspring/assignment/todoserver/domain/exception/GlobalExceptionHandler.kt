@@ -1,7 +1,9 @@
 package spartacodingclub.nbcamp.kotlinspring.assignment.todoserver.domain.exception
 
+import jakarta.validation.ConstraintViolationException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoserver.domain.exception.dto.ErrorResponse
@@ -20,4 +22,16 @@ class GlobalExceptionHandler {
         ResponseEntity
             .status(HttpStatus.UNAUTHORIZED)
             .body(ErrorResponse(ex.message))
+
+    @ExceptionHandler(MethodArgumentNotValidException::class)
+    fun handleMethodArgumentNotValidException(ex: MethodArgumentNotValidException): ResponseEntity<ErrorResponse> =
+        ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .body(ErrorResponse(ex.bindingResult.fieldErrors.map { "[Invalid ${it.field}: ${it.defaultMessage}]" }.joinToString(" / ")))
+
+    @ExceptionHandler(ConstraintViolationException::class)
+    fun handleConstraintViolationException(ex: ConstraintViolationException): ResponseEntity<ErrorResponse> =
+        ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .body(ErrorResponse(ex.constraintViolations.map { "Invalid ${it.propertyPath}: ${it.message}]" }.joinToString(" / ")))
 }
