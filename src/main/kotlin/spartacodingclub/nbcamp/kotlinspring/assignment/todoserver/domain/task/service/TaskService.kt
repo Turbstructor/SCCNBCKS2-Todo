@@ -32,7 +32,18 @@ class TaskService(
         return taskRepository.save(task).toResponse()
     }
 
-    fun getAllTasks(): List<TaskResponse> = taskRepository.findAll().map { it.toResponse() }
+    fun getAllTasks(author: String?, sortByTimeCreatedAsc: Boolean?): List<TaskResponse> {
+        val tasksQueried = when (author) {
+            null, "" -> taskRepository.findAll()
+            else -> taskRepository.findAllByOwner(author)
+        }
+
+        return when (sortByTimeCreatedAsc) {
+            null -> tasksQueried
+            true -> tasksQueried.sortedWith(compareBy { it.timeCreated })
+            else -> tasksQueried.sortedWith(compareByDescending { it.timeCreated })
+        }.map { it.toResponse() }
+    }
 
     fun getTask(taskId: Long): TaskFullResponse =
         (taskRepository.findByIdOrNull(taskId) ?: throw ItemNotFoundException(taskId, "task"))
