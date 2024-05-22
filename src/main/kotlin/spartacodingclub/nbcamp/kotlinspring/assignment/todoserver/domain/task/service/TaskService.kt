@@ -67,7 +67,7 @@ class TaskService(
     @Transactional
     fun toggleTaskCompletion(taskId: Long) {
         val task = taskRepository.findByIdOrNull(taskId) ?: throw ItemNotFoundException(taskId, "task")
-        task.isDone = !task.isDone
+        task.toggleCompletion()
         taskRepository.save(task)
     }
 

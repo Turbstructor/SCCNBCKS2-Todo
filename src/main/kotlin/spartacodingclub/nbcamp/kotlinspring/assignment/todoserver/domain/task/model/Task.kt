@@ -53,6 +53,8 @@ class Task(
         comments.remove(comment)
     }
 
+    fun toggleCompletion() { isDone = !isDone }
+
     fun toResponse(): TaskResponse = TaskResponse(id!!, title, description, isDone, owner, timeCreated!!, timeUpdated!!)
     fun toFullResponse(): TaskFullResponse = TaskFullResponse(id!!, title, description, isDone, owner, timeCreated!!, timeUpdated!!, comments.map { it.toSimplifiedResponse() })
 }
