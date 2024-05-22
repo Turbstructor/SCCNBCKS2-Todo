@@ -1,10 +1,8 @@
 package spartacodingclub.nbcamp.kotlinspring.assignment.todoserver.domain.task.service
 
-import jakarta.validation.Valid
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import org.springframework.validation.annotation.Validated
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoserver.domain.comment.dto.request.CreateCommentRequest
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoserver.domain.comment.dto.request.RemoveCommentRequest
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoserver.domain.comment.dto.request.UpdateCommentRequest
@@ -20,7 +18,6 @@ import spartacodingclub.nbcamp.kotlinspring.assignment.todoserver.domain.task.dt
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoserver.domain.task.model.Task
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoserver.domain.task.repository.TaskRepository
 
-@Validated
 @Service
 class TaskService(
     private val taskRepository: TaskRepository,
@@ -30,7 +27,7 @@ class TaskService(
     // Tasks
 
     @Transactional
-    fun createTask(@Valid request: CreateTaskRequest): TaskResponse {
+    fun createTask(request: CreateTaskRequest): TaskResponse {
         val task = Task(request.title, request.description, request.owner)
         return taskRepository.save(task).toResponse()
     }
@@ -53,7 +50,7 @@ class TaskService(
         .toFullResponse()
 
     @Transactional
-    fun updateTask(taskId: Long, @Valid request: UpdateTaskRequest): TaskResponse {
+    fun updateTask(taskId: Long, request: UpdateTaskRequest): TaskResponse {
         val task = taskRepository.findByIdOrNull(taskId) ?: throw ItemNotFoundException(taskId, "task")
 
         var isModified =
