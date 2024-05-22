@@ -6,6 +6,8 @@ import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoserver.domain.comment.model.Comment
+import spartacodingclub.nbcamp.kotlinspring.assignment.todoserver.domain.task.dto.request.CreateTaskRequest
+import spartacodingclub.nbcamp.kotlinspring.assignment.todoserver.domain.task.dto.request.UpdateTaskRequest
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoserver.domain.task.dto.response.TaskResponse
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoserver.domain.task.dto.response.TaskFullResponse
 import java.time.LocalDateTime
@@ -44,6 +46,11 @@ class Task(
     @OneToMany(mappedBy = "task", cascade = [(CascadeType.ALL)], orphanRemoval = true)
     var comments: MutableList<Comment> = mutableListOf()
 
+    constructor (request: CreateTaskRequest) : this (
+        title = request.title,
+        description = request.description,
+        owner = request.owner
+    )
 
     fun addComment(comment: Comment) {
         comments.add(comment)
@@ -54,6 +61,11 @@ class Task(
     }
 
     fun toggleCompletion() { isDone = !isDone }
+
+    fun update(request: UpdateTaskRequest) {
+        this.title = request.title
+        this.description = request.description
+    }
 
     fun toResponse(): TaskResponse = TaskResponse(id!!, title, description, isDone, owner, timeCreated!!, timeUpdated!!)
     fun toFullResponse(): TaskFullResponse = TaskFullResponse(id!!, title, description, isDone, owner, timeCreated!!, timeUpdated!!, comments.map { it.toSimplifiedResponse() })

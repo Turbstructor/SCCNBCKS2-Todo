@@ -26,11 +26,8 @@ class TaskService(
 
     // Tasks
 
-    @Transactional
-    fun createTask(request: CreateTaskRequest): TaskResponse {
-        val task = Task(request.title, request.description, request.owner)
-        return taskRepository.save(task).toResponse()
-    }
+    fun createTask(request: CreateTaskRequest): TaskResponse =
+        taskRepository.save(Task(request)).toResponse()
 
     fun getAllTasks(author: String?, sortByTimeCreatedAsc: Boolean?): List<TaskResponse> {
         val tasksQueried = when (author) {
@@ -49,29 +46,21 @@ class TaskService(
         (taskRepository.findByIdOrNull(taskId) ?: throw ItemNotFoundException(taskId, "task"))
         .toFullResponse()
 
-    @Transactional
+
     fun updateTask(taskId: Long, request: UpdateTaskRequest): TaskResponse {
         val task = taskRepository.findByIdOrNull(taskId) ?: throw ItemNotFoundException(taskId, "task")
-
-        var isModified =
-            ((task.title != request.title) or (task.description != request.description) or (task.owner != request.owner))
-        if (isModified) {
-            task.title = request.title
-            task.description = request.description
-            task.owner = request.owner
-        }
-
-        return if (isModified) taskRepository.save(task).toResponse() else task.toResponse()
+        task.update(request)
+        return taskRepository.save(task).toResponse()
     }
 
-    @Transactional
+
     fun toggleTaskCompletion(taskId: Long) {
         val task = taskRepository.findByIdOrNull(taskId) ?: throw ItemNotFoundException(taskId, "task")
         task.toggleCompletion()
         taskRepository.save(task)
     }
 
-    @Transactional
+
     fun removeTask(taskId: Long) {
         val task = taskRepository.findByIdOrNull(taskId) ?: throw ItemNotFoundException(taskId, "task")
         taskRepository.delete(task)
@@ -83,7 +72,7 @@ class TaskService(
     @Transactional
     fun createComment(taskId: Long, request: CreateCommentRequest): CommentResponse {
         val task = taskRepository.findByIdOrNull(taskId) ?: throw ItemNotFoundException(taskId, "task")
-        val comment = Comment(request.content, request.owner, request.password, task)
+        val comment = Comment(request,task)
 
         task.addComment(comment)
 
@@ -105,20 +94,11 @@ class TaskService(
         )).toResponse()
 
 
-    @Transactional
     fun updateComment(taskId: Long, commentId: Long, request: UpdateCommentRequest): CommentResponse {
         val comment =
             commentRepository.findByTaskIdAndId(taskId, commentId) ?: throw ItemNotFoundException(commentId, "comment")
-
-        if (request.owner != comment.owner || request.password != comment.password) throw UnauthorizedAccessException(
-            null
-        )
-
-        if (request.content == comment.content) return comment.toResponse()
-        else {
-            comment.content = request.content
-            return commentRepository.save(comment).toResponse()
-        }
+        comment.update(request)
+        return commentRepository.save(comment).toResponse()
     }
 
 
@@ -128,9 +108,8 @@ class TaskService(
         val comment =
             commentRepository.findByTaskIdAndId(taskId, commentId) ?: throw ItemNotFoundException(commentId, "comment")
 
-        if (request.owner != comment.owner || request.password != comment.password) throw UnauthorizedAccessException(
-            null
-        )
+        if (request.owner != comment.owner || request.password != comment.password) throw UnauthorizedAccessException("comment" +
+                "")
 
         task.removeComment(comment)
         commentRepository.delete(comment)
