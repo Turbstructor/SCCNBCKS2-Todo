@@ -33,5 +33,11 @@ class GlobalExceptionHandler {
     fun handleConstraintViolationException(ex: ConstraintViolationException): ResponseEntity<ErrorResponse> =
         ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
-            .body(ErrorResponse("ConstraintViolationException: ${ex.constraintViolations.map { "Invalid ${it.propertyPath}: ${it.message}]" }.joinToString(" / ")}"))
+            .body(
+                ErrorResponse(
+                    "ConstraintViolationException: ${
+                        ex.constraintViolations.map { "Invalid ${it.propertyPath}: ${it.message}]" }.joinToString(" / ")
+                    }"
+                )
+            )
 }

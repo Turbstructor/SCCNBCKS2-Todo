@@ -44,7 +44,7 @@ class TaskService(
 
     fun getTask(taskId: Long): TaskFullResponse =
         (taskRepository.findByIdOrNull(taskId) ?: throw ItemNotFoundException(taskId, "task"))
-        .toFullResponse()
+            .toFullResponse()
 
 
     fun updateTask(taskId: Long, request: UpdateTaskRequest): TaskResponse {
@@ -72,7 +72,7 @@ class TaskService(
     @Transactional
     fun createComment(taskId: Long, request: CreateCommentRequest): CommentResponse {
         val task = taskRepository.findByIdOrNull(taskId) ?: throw ItemNotFoundException(taskId, "task")
-        val comment = Comment(request,task)
+        val comment = Comment(request, task)
 
         task.addComment(comment)
 
@@ -108,8 +108,7 @@ class TaskService(
         val comment =
             commentRepository.findByTaskIdAndId(taskId, commentId) ?: throw ItemNotFoundException(commentId, "comment")
 
-        if (request.owner != comment.owner || request.password != comment.password) throw UnauthorizedAccessException("comment" +
-                "")
+        if (request.owner != comment.owner || request.password != comment.password) throw UnauthorizedAccessException("comment")
 
         task.removeComment(comment)
         commentRepository.delete(comment)

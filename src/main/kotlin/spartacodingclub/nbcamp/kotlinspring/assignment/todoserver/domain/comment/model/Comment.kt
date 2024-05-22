@@ -51,7 +51,7 @@ class Comment(
     var timeUpdated: LocalDateTime? = null
 
 
-    constructor (request: CreateCommentRequest, relatedTask: Task): this(
+    constructor (request: CreateCommentRequest, relatedTask: Task) : this(
         content = request.content,
         owner = request.owner,
         password = request.password,
@@ -59,11 +59,14 @@ class Comment(
     )
 
     fun update(request: UpdateCommentRequest) {
-        if(request.owner != this.owner || request.password != this.password) throw UnauthorizedAccessException("comment")
+        if (request.owner != this.owner || request.password != this.password) throw UnauthorizedAccessException("comment")
 
         this.content = request.content
     }
 
-    fun toResponse(): CommentResponse = CommentResponse(id!!, content, owner, timeCreated!!, timeUpdated!!, task.toResponse())
-    fun toSimplifiedResponse(): CommentSimplifiedResponse = CommentSimplifiedResponse(id!!, content, owner, timeCreated!!, timeUpdated!!)
+    fun toResponse(): CommentResponse =
+        CommentResponse(id!!, content, owner, timeCreated!!, timeUpdated!!, task.toResponse())
+
+    fun toSimplifiedResponse(): CommentSimplifiedResponse =
+        CommentSimplifiedResponse(id!!, content, owner, timeCreated!!, timeUpdated!!)
 }

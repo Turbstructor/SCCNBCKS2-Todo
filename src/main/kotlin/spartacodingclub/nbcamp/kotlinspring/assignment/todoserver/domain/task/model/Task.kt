@@ -46,7 +46,7 @@ class Task(
     @OneToMany(mappedBy = "task", cascade = [(CascadeType.ALL)], orphanRemoval = true)
     var comments: MutableList<Comment> = mutableListOf()
 
-    constructor (request: CreateTaskRequest) : this (
+    constructor (request: CreateTaskRequest) : this(
         title = request.title,
         description = request.description,
         owner = request.owner
@@ -60,7 +60,9 @@ class Task(
         comments.remove(comment)
     }
 
-    fun toggleCompletion() { isDone = !isDone }
+    fun toggleCompletion() {
+        isDone = !isDone
+    }
 
     fun update(request: UpdateTaskRequest) {
         this.title = request.title
@@ -68,5 +70,7 @@ class Task(
     }
 
     fun toResponse(): TaskResponse = TaskResponse(id!!, title, description, isDone, owner, timeCreated!!, timeUpdated!!)
-    fun toFullResponse(): TaskFullResponse = TaskFullResponse(id!!, title, description, isDone, owner, timeCreated!!, timeUpdated!!, comments.map { it.toSimplifiedResponse() })
+    fun toFullResponse(): TaskFullResponse = TaskFullResponse(
+        id!!, title, description, isDone, owner,
+        timeCreated!!, timeUpdated!!, comments.map { it.toSimplifiedResponse() })
 }

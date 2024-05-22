@@ -23,7 +23,10 @@ class TaskController(
 
 
     @GetMapping
-    fun getAllTasks(@RequestParam(required = false) author: String?, @RequestParam(required = false) sortByTimeCreatedAsc: Boolean?): ResponseEntity<List<TaskResponse>> =
+    fun getAllTasks(
+        @RequestParam(required = false) author: String?,
+        @RequestParam(required = false) sortByTimeCreatedAsc: Boolean?
+    ): ResponseEntity<List<TaskResponse>> =
         ResponseEntity
             .status(HttpStatus.OK)
             .body(taskService.getAllTasks(author, sortByTimeCreatedAsc))
