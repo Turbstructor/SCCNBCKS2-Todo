@@ -1,6 +1,5 @@
 package spartacodingclub.nbcamp.kotlinspring.assignment.todoserver.domain.task.controller
 
-import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -17,14 +16,17 @@ class TaskController(
 ) {
 
     @PostMapping
-    fun createTask(@Valid @RequestBody request: CreateTaskRequest): ResponseEntity<TaskResponse> =
+    fun createTask(@RequestBody request: CreateTaskRequest): ResponseEntity<TaskResponse> =
         ResponseEntity
             .status(HttpStatus.CREATED)
             .body(taskService.createTask(request))
 
 
     @GetMapping
-    fun getAllTasks(@RequestParam(required = false) author: String?, @RequestParam(required = false) sortByTimeCreatedAsc: Boolean?): ResponseEntity<List<TaskResponse>> =
+    fun getAllTasks(
+        @RequestParam(required = false) author: String?,
+        @RequestParam(required = false) sortByTimeCreatedAsc: Boolean?
+    ): ResponseEntity<List<TaskResponse>> =
         ResponseEntity
             .status(HttpStatus.OK)
             .body(taskService.getAllTasks(author, sortByTimeCreatedAsc))
@@ -36,11 +38,12 @@ class TaskController(
             .body(taskService.getTask(taskId))
 
 
-    @PatchMapping("/{taskId}")
-    fun updateTask(@PathVariable taskId: Long, @Valid @RequestBody request: UpdateTaskRequest): ResponseEntity<TaskResponse> =
+    @PutMapping("/{taskId}")
+    fun updateTask(@PathVariable taskId: Long, @RequestBody request: UpdateTaskRequest): ResponseEntity<TaskResponse> =
         ResponseEntity
             .status(HttpStatus.OK)
             .body(taskService.updateTask(taskId, request))
+
 
     @PatchMapping("/{taskId}/completion")
     fun toggleTaskCompletion(@PathVariable taskId: Long): ResponseEntity<Unit> {
@@ -49,6 +52,7 @@ class TaskController(
             .status(HttpStatus.NO_CONTENT)
             .build()
     }
+
 
     @DeleteMapping("/{taskId}")
     fun removeTask(@PathVariable taskId: Long): ResponseEntity<Unit> {

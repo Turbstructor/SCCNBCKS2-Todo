@@ -12,8 +12,11 @@ import jakarta.persistence.Table
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
+import spartacodingclub.nbcamp.kotlinspring.assignment.todoserver.domain.comment.dto.request.CreateCommentRequest
+import spartacodingclub.nbcamp.kotlinspring.assignment.todoserver.domain.comment.dto.request.UpdateCommentRequest
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoserver.domain.comment.dto.response.CommentResponse
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoserver.domain.comment.dto.response.CommentSimplifiedResponse
+import spartacodingclub.nbcamp.kotlinspring.assignment.todoserver.domain.exception.UnauthorizedAccessException
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoserver.domain.task.model.Task
 import java.time.LocalDateTime
 
@@ -48,6 +51,22 @@ class Comment(
     var timeUpdated: LocalDateTime? = null
 
 
-    fun toResponse(): CommentResponse = CommentResponse(id!!, content, owner, timeCreated!!, timeUpdated!!, task.toResponse())
-    fun toSimplifiedResponse(): CommentSimplifiedResponse = CommentSimplifiedResponse(id!!, content, owner, timeCreated!!, timeUpdated!!)
+    constructor (request: CreateCommentRequest, relatedTask: Task) : this(
+        content = request.content,
+        owner = request.owner,
+        password = request.password,
+        task = relatedTask
+    )
+
+    fun update(request: UpdateCommentRequest) {
+        if (request.owner != this.owner || request.password != this.password) throw UnauthorizedAccessException("comment")
+
+        this.content = request.content
+    }
+
+    fun toResponse(): CommentResponse =
+        CommentResponse(id!!, content, owner, timeCreated!!, timeUpdated!!, task.toResponse())
+
+    fun toSimplifiedResponse(): CommentSimplifiedResponse =
+        CommentSimplifiedResponse(id!!, content, owner, timeCreated!!, timeUpdated!!)
 }
