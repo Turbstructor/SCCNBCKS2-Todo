@@ -141,6 +141,7 @@ erDiagram
         String title
         String description
         String owner
+        Boolean isDone
         LocalDateTime timeCreated
         LocalDateTime timeUpdated
     }
@@ -167,6 +168,7 @@ task (
   title TEXT not null,
   description TEXT not null,
   owner TEXT not null,
+  is_done BOOLEAN not null,
   time_created timestamptz,
   time_updated timestamptz
 );
@@ -192,16 +194,17 @@ comment (
 
 - 4-1-1. 할 일(`task`) 관련
 
-| Feature     |   Method | URL                   | Request                                                          | Response             |
-|-------------|---------:|-----------------------|------------------------------------------------------------------|----------------------|
-| 할 일 추가      |   `POST` | `/api/tasks`          | body: `CreateTaskRequest`                                        | `TaskResponse`       |
-| 할 일 조회 (목록) |    `GET` | `/api/tasks`          | parameter: `author`(`String`), `sortByTimeCreatedAsc`(`Boolean`) | `List<TaskResponse>` |
-| 할 일 조회      |    `GET` | `/api/tasks/{taskId}` | -                                                                | `TaskResponse`       |
-| 할 일 수정      |  `PATCH` | `/api/tasks/{taskId}` | body: `UpdateTaskRequest`                                        | `TaskResponse`       |
-| 할 일 삭제      | `DELETE` | `/api/tasks/{taskId}` | -                                                                | -                    |
+| Feature     |   Method | URL                              | Request                                                          | Response             |
+|-------------|---------:|----------------------------------|------------------------------------------------------------------|----------------------|
+| 할 일 추가      |   `POST` | `/api/tasks`                     | body: `CreateTaskRequest`                                        | `TaskResponse`       |
+| 할 일 조회 (목록) |    `GET` | `/api/tasks`                     | parameter: `author`(`String`), `sortByTimeCreatedAsc`(`Boolean`) | `List<TaskResponse>` |
+| 할 일 조회      |    `GET` | `/api/tasks/{taskId}`            | -                                                                | `TaskResponse`       |
+| 할 일 수정      |    `PUT` | `/api/tasks/{taskId}`            | body: `UpdateTaskRequest`                                        | `TaskResponse`       |
+| 할 일 완료 토글   |  `PATCH` | `/api/tasks/{taskId}/completion` | -                                                                | -                    
+| 할 일 삭제      | `DELETE` | `/api/tasks/{taskId}`            | -                                                                | -                    |
 
 - *특정* 할 일(`Task`)을 조회할 때 `taskId`가 존재하지 않을 경우 `ItemNotFoundException` 발생
-- 할 일 수정 시(`PATCH /api/tasks/{taskId}`) 수정사항이 없을 경우 **DB에 변경사항을 저장하지 않음**
+- 할 일 수정 시(`PUT /api/tasks/{taskId}`) 수정사항이 없을 경우 **DB에 변경사항을 저장하지 않음**
   - `timeUpdated` 갱신을 막기 위함
 - 할 일(`task`) 목록 조회 시 _필수가 아닌_ 패러미터 2개를 받음
   - `author`: 할 일(`task`) 작성자, 비어있지 않을 경우 **해당 작성자의 이름으로 만든** 할 일만 목록에 포함
@@ -302,6 +305,7 @@ data class TaskResponse(
     val id: Long?,                      // 할 일의 ID
     val title: String,                  // 할 일의 제목
     val description: String,            // 할 일의 본문
+    val isDone: Boolean                 // 할 일 완료 여부
     val owner: String,                  // 할 일의 소유자
     val timeCreated: LocalDateTime?,    // 할 일의 생성 시각
     val timeUpdated: LocalDateTime?     // 할 일의 마지막 수정 시각
@@ -357,6 +361,7 @@ import java.time.LocalDateTime
 data class CommentSimplifiedResponse(
   val id: Long,
   val content: String,
+  val isDone: Boolean,
   val owner: String,
   val timeCreated: LocalDateTime,
   val timeUpdated: LocalDateTime
