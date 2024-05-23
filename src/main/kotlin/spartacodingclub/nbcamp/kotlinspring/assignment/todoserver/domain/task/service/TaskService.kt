@@ -29,7 +29,7 @@ class TaskService(
     fun createTask(request: CreateTaskRequest): TaskResponse =
         taskRepository.save(Task(request)).toResponse()
 
-    fun getAllTasks(author: String?, sortByTimeCreatedAsc: Boolean?): List<TaskResponse> {
+    fun getAllTasks(author: String?, sortByTimeCreatedAsc: Boolean?): List<TaskFullResponse> {
         val tasksQueried = when (author) {
             null, "" -> taskRepository.findAll()
             else -> taskRepository.findAllByOwner(author)
@@ -39,7 +39,7 @@ class TaskService(
             null -> tasksQueried
             true -> tasksQueried.sortedWith(compareBy { it.timeCreated })
             else -> tasksQueried.sortedWith(compareByDescending { it.timeCreated })
-        }.map { it.toResponse() }
+        }.map { it.toFullResponse() }
     }
 
     fun getTask(taskId: Long): TaskFullResponse =
