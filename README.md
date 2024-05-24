@@ -30,19 +30,19 @@
 <details> <summary>1-1. Step 1 (필수)</summary>
 
 - 할 일(`task`) 관련 `CRUD` 기능 추가
-  - [v] 할 일 작성
+  - [x] 할 일 작성
       - `할 일 제목`, `할 일 내용`, `작성일`, `작성자 이름` 저장
       - 추가된 `할 일` 정보 확인 가능
-  - [v] 할 일 조회
+  - [x] 할 일 조회
       - 선택한 할 일 정보 조회
       - `할 일 제목`, `할 일 내용`, `작성일`, `작성자 이름` 포함
-  - [v] 할 일 _목록_ 조회
+  - [x] 할 일 _목록_ 조회
       - 등록된 전체 할 일 목록 조회
       - 작성일 기준 *내림차순* 정렬
-  - [v] 할 일 수정
+  - [x] 할 일 수정
       - `할 일 제목`, `작성자명`, `작성 내용` 수정
       - 수정된 정보 확인 가능
-  - [v] 할 일 삭제
+  - [x] 할 일 삭제
       - 선택한 할 일 삭제
 
 </details>
@@ -50,34 +50,44 @@
 <details> <summary>1-2. Step 2 (선택)</summary>
 
 - 댓글(`comment`) 관련 `CRUD` 기능 추가
-  - [v] 댓글 작성
+  - [x] 댓글 작성
     - 댓글 추가 후 추가된 댓글 정보를 `response`로 반환(비밀번호는 _제외_ 해야 함)
     - 댓글 달 대상 `할 일`의 존재 여부 확인
     - 댓글 내용 이외에 작성자 정보(이름, 비밀번호) 추가로 받기
-  - [v] 댓글 수정 
+  - [x] 댓글 수정 
     - 댓글 수정 후 _수정된_ 댓글 정보를 `response`로 반환(비밀번호는 _제외_ 해야 함)
     - 댓글의 존재 유무 확인
     - 대상 댓글의 작성자 정보(이름, 비밀번호)와 `request`로 들어온 작성자 정보 일치 여부 확인
-  - [v] 댓글 삭제
+  - [x] 댓글 삭제
     - 댓글 삭제 후 성공 여부 반환
     - 댓글의 존재 유무 확인
     - 대상 댓글의 작성자 정보(이름, 비밀번호)와 `request`로 들어온 작성자 정보 일치 여부 확인
 - 할 일(`task`) 관련 기능 보강
-  - [v] 할 일 완료 여부 기능 추가
+  - [x] 할 일 완료 여부 기능 추가
     - 할 일 추가 시 기본적으로 `FALSE`로 설정
-  - [v] '할 일 조회' 기능에 연관 댓글 목록 추가
+  - [x] '할 일 조회' 기능에 연관 댓글 목록 추가
 
 </details>
 
 <details> <summary>1-3. Step 3 (선택)</summary>
 
-- [v] 할 일(`task`) 목록 조회(`GET /api/tasks`) 기능 보강
+- [x] 할 일(`task`) 목록 조회(`GET /api/tasks`) 기능 보강
   - 할 일 작성일을 기준으로 오름차순/내림차순 정렬하는 기능 추가
   - 작성자 이름 포함 시 해당 작성자가 작성한 할 일만 포함하는 기능 추가
-- [v] 할 일(`task`) 관련 무결성 검사 기능 추가
+- [x] 할 일(`task`) 관련 무결성 검사 기능 추가
   - 할 일 추가/수정 시 제목/내용에 길이 제한(각각 [1, 200], [1, 1000]) 추가
   - 제한을 어길 경우 추가/수정 요청을 받아들이지 않게 처리
-- [v] `ResponseEntity`를 사용하여 `API Call`의 응답 코드 반환
+- [x] `ResponseEntity`를 사용하여 `API Call`의 응답 코드 반환
+
+</details>
+
+<details> <summary>1-4. Step 4 (선택)</summary>
+
+- [x] 할 일(`task`) 목록 조회(`GET /api/tasks`) 기능 보강
+  - 각 할 일에 연관된 댓글 내용 추가(`N + 1 query` 문제 해결)
+  - `Pagination` 기능 추가
+- [ ] 회원 기능 추가
+  - 로그인한 사용자*만* *자신의* 할 일/댓글 수정/삭제 가능
 
 </details>
 
@@ -144,6 +154,7 @@ erDiagram
         Boolean isDone
         LocalDateTime timeCreated
         LocalDateTime timeUpdated
+        List~Comment~ comments
     }
 
     Comment {
@@ -194,14 +205,14 @@ comment (
 
 - 4-1-1. 할 일(`task`) 관련
 
-| Feature     |   Method | URL                              | Request                                                          | Response             |
-|-------------|---------:|----------------------------------|------------------------------------------------------------------|----------------------|
-| 할 일 추가      |   `POST` | `/api/tasks`                     | body: `CreateTaskRequest`                                        | `TaskResponse`       |
-| 할 일 조회 (목록) |    `GET` | `/api/tasks`                     | parameter: `author`(`String`), `sortByTimeCreatedAsc`(`Boolean`) | `List<TaskResponse>` |
-| 할 일 조회      |    `GET` | `/api/tasks/{taskId}`            | -                                                                | `TaskResponse`       |
-| 할 일 수정      |    `PUT` | `/api/tasks/{taskId}`            | body: `UpdateTaskRequest`                                        | `TaskResponse`       |
-| 할 일 완료 토글   |  `PATCH` | `/api/tasks/{taskId}/completion` | -                                                                | -                    
-| 할 일 삭제      | `DELETE` | `/api/tasks/{taskId}`            | -                                                                | -                    |
+| Feature     |   Method | URL                              | Request                                                                                | Response                         |
+|-------------|---------:|----------------------------------|----------------------------------------------------------------------------------------|----------------------------------|
+| 할 일 추가      |   `POST` | `/api/tasks`                     | body: `CreateTaskRequest`                                                              | `TaskResponse`                   |
+| 할 일 조회 (목록) |    `GET` | `/api/tasks`                     | parameter: `author`(`String`), `sortByTimeCreatedAsc`(`Boolean`), `sliceNumber`(`Int`) | `TaskPageResponse` |
+| 할 일 조회      |    `GET` | `/api/tasks/{taskId}`            | -                                                                                      | `TaskResponse`                   |
+| 할 일 수정      |    `PUT` | `/api/tasks/{taskId}`            | body: `UpdateTaskRequest`                                                              | `TaskResponse`                   |
+| 할 일 완료 토글   |  `PATCH` | `/api/tasks/{taskId}/completion` | -                                                                                      | -                                
+| 할 일 삭제      | `DELETE` | `/api/tasks/{taskId}`            | -                                                                                      | -                                |
 
 - *특정* 할 일(`Task`)을 조회할 때 `taskId`가 존재하지 않을 경우 `ItemNotFoundException` 발생
 - 할 일 수정 시(`PUT /api/tasks/{taskId}`) 수정사항이 없을 경우 **DB에 변경사항을 저장하지 않음**
@@ -209,6 +220,7 @@ comment (
 - 할 일(`task`) 목록 조회 시 _필수가 아닌_ 패러미터 2개를 받음
   - `author`: 할 일(`task`) 작성자, 비어있지 않을 경우 **해당 작성자의 이름으로 만든** 할 일만 목록에 포함
   - `sortByTimeCreatedAsc`: 할 일 목록을 작성일 기준 오름차순 정렬 옵션. 옵션이 주어지지 않을 경우 `true`일 때와 동일하게 오름차순으로 정렬, `false`일 경우 내림차순으로 정렬
+  - `sliceNumber`: 조회 시 새로 로드할 할 일의 슬라이스 번호(5개 단위로 끊어짐)
 - 할 일 추가/수정 시 올바르지 않은 데이터 - 길이 범위에 부합하지 않는 제목/내용 - 가 들어왔을 경우 `ConstraintViolationException`/`MethodArgumentNotValidException` 발생
 
 
@@ -328,6 +340,17 @@ data class TaskFullResponse(
   val timeCreated: LocalDateTime,
   val timeUpdated: LocalDateTime,
   val comments: List<CommentSimplifiedResponse> // 할 일에 달린 댓글들 목록
+)
+```
+
+- 4-2-2-1-3. `TaskPageResponse` (_Step 4에서 추가됨_)
+
+할 일(`task`) 목록을 조회할 때(`GET /api/tasks`) **댓글을 포함한** 할일들의 목록-의 페이지(slice)를 서버에서 보내는 응답
+```kotlin
+data class TaskPageResponse(
+    val content: List<TaskFullResponse>,    // 할 일의 (댓글을 포함한) 목록
+    val pageNumber: Int,                    // 가져온 목록의 부분 번호
+    val isLast: Boolean                     // 가져온 목록 파편이 마지막인지 확인하는 여부
 )
 ```
 
