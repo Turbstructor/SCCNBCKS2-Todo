@@ -1,5 +1,6 @@
 package spartacodingclub.nbcamp.kotlinspring.assignment.todoserver.domain.task.service
 
+import org.springframework.data.domain.*
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -14,6 +15,7 @@ import spartacodingclub.nbcamp.kotlinspring.assignment.todoserver.domain.excepti
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoserver.domain.task.dto.request.CreateTaskRequest
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoserver.domain.task.dto.request.UpdateTaskRequest
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoserver.domain.task.dto.response.TaskFullResponse
+import spartacodingclub.nbcamp.kotlinspring.assignment.todoserver.domain.task.dto.response.TaskPageResponse
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoserver.domain.task.dto.response.TaskResponse
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoserver.domain.task.model.Task
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoserver.domain.task.repository.TaskRepository
@@ -29,18 +31,22 @@ class TaskService(
     fun createTask(request: CreateTaskRequest): TaskResponse =
         taskRepository.save(Task(request)).toResponse()
 
-    fun getAllTasks(author: String?, sortByTimeCreatedAsc: Boolean?): List<TaskFullResponse> {
-        val tasksQueried = when (author) {
-            null, "" -> taskRepository.findAll()
-            else -> taskRepository.findAllByOwner(author)
+
+    fun getAllTasks(author: String?, sortByTimeCreatedAsc: Boolean?, sliceNumber: Int): TaskPageResponse {
+        val sorter = when (sortByTimeCreatedAsc) {
+            null -> Sort.unsorted()
+            true -> Sort.by("timeCreated").ascending()
+            else -> Sort.by("timeCreated").descending()
         }
 
-        return when (sortByTimeCreatedAsc) {
-            null -> tasksQueried
-            true -> tasksQueried.sortedWith(compareBy { it.timeCreated })
-            else -> tasksQueried.sortedWith(compareByDescending { it.timeCreated })
+        val taskSlice = when (author) {
+            null, "" -> taskRepository.findAllBy(PageRequest.of(sliceNumber, 5, sorter))
+            else -> taskRepository.findAllByOwner(author, PageRequest.of(sliceNumber, 5, sorter))
         }.map { it.toFullResponse() }
+
+        return TaskPageResponse(taskSlice.content, taskSlice.number, taskSlice.isLast)
     }
+
 
     fun getTask(taskId: Long): TaskFullResponse =
         (taskRepository.findByIdOrNull(taskId) ?: throw ItemNotFoundException(taskId, "task"))
@@ -85,7 +91,7 @@ class TaskService(
 
     fun getCommentsList(taskId: Long): List<CommentResponse> =
         (taskRepository.findByIdOrNull(taskId) ?: throw ItemNotFoundException(taskId, "task"))
-            .comments.map() { it.toResponse() }
+            .comments.map { it.toResponse() }
 
     fun getComment(taskId: Long, commentId: Long): CommentResponse =
         (commentRepository.findByTaskIdAndId(taskId, commentId) ?: throw ItemNotFoundException(

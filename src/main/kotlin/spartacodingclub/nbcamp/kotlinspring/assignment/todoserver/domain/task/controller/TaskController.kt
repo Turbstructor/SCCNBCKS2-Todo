@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoserver.domain.task.dto.request.CreateTaskRequest
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoserver.domain.task.dto.request.UpdateTaskRequest
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoserver.domain.task.dto.response.TaskFullResponse
+import spartacodingclub.nbcamp.kotlinspring.assignment.todoserver.domain.task.dto.response.TaskPageResponse
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoserver.domain.task.dto.response.TaskResponse
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoserver.domain.task.service.TaskService
 
@@ -25,11 +26,12 @@ class TaskController(
     @GetMapping
     fun getAllTasks(
         @RequestParam(required = false) author: String?,
-        @RequestParam(required = false) sortByTimeCreatedAsc: Boolean?
-    ): ResponseEntity<List<TaskFullResponse>> =
+        @RequestParam(required = false) sortByTimeCreatedAsc: Boolean?,
+        @RequestParam(required = false, defaultValue = "0") sliceNumber: Int
+    ): ResponseEntity<TaskPageResponse> =
         ResponseEntity
             .status(HttpStatus.OK)
-            .body(taskService.getAllTasks(author, sortByTimeCreatedAsc))
+            .body(taskService.getAllTasks(author, sortByTimeCreatedAsc, sliceNumber))
 
     @GetMapping("/{taskId}")
     fun getTask(@PathVariable taskId: Long): ResponseEntity<TaskFullResponse> =
